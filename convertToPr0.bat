@@ -85,10 +85,11 @@ REM  */
     if not defined THE_FFPROBE call:abort "ffprobe not found" %RC_FFPROBENotFound%&exit /b %RC_FFPROBENotFound%
 
     REM - check arguments
+    if not defined THE_INPUTFILES call:abort "no files found" %RC_NoFilesFoundFailed%&exit /b %RC_NoFilesFoundFailed%
     call:CheckArguments
 
     REM - Führt den Convert aus
-    if defined JUST_EXECUTE call:install "%THE_PACKETPATH%" "%JUST_INSTALL_FanucEdit%" "%JUST_INSTALL_VKRC_Editor%" "%JUST_INSTALL_Dongledriver%" "%JUST_INSTALL_VCRedist%" "%JUST_INSTALL_KeyManFlex%"
+    if defined JUST_EXECUTE call:execute %THE_INPUTFILES%
     if defined JUST_EXECUTE set RC=%ERRORLEVEL%
     if %RC% neq 0 call:abort "video convert failed" %RC_executeFailed%&exit /b %RC_executeFailed%
 
@@ -129,10 +130,16 @@ REM ----------------------------------------------------------------------------
 :CheckArguments
 
 if not defined THE_SIZE set /p THE_SIZE=Choose file size in MB (10MB normal, 20MB pr0): 
-if not defined JUST_AUDIO set /p JUST_AUDIO=Do you want audio? (y/n): 
-if not defined THE_RESOLUTION set /p THE_RESOLUTION=Set resolution (720/1080/2160): 
+if not defined THE_SIZE set THE_SIZE=10
 
+if not defined JUST_AUDIO set /p JUST_AUDIO=Do you want audio? (Y/n): 
+if not defined JUST_AUDIO set JUST_AUDIO=true
 if "%JUST_AUDIO%" equ "n" set JUST_AUDIO=
+
+if not defined THE_RESOLUTION set /p THE_RESOLUTION=Set resolution (720/1080/2160): 
+if not defined THE_RESOLUTION set THE_RESOLUTION=720
+
+set JUST_EXECUTE=true
 
 goto:eof
 
@@ -181,16 +188,16 @@ setlocal
     set audio=-an
     if defined withAudio set audio=-b:a 96k
 
-    set argumentsOne=-y -i "%~1" -c:v libx264 -preset medium -b:v %bitrate%k -pass 1 %audio% -f mp4>NUL
-    set argumentsTwo=-i "%~1" -c:v libx264 -vf scale=-1:%resolution% -preset medium -b:v %bitrate%k -pass 2 %audio% "%outputFile%">NUL
+    set argumentsOne=-y -i "%~1" -c:v libx264 -preset medium -b:v %bitrate%k -pass 1 %audio% -f mp4 NUL
+    set argumentsTwo=-i "%~1" -c:v libx264 -vf scale=-1:%resolution% -preset medium -b:v %bitrate%k -pass 2 %audio% "%outputFile%"
 
     REM pushd "%packet_path%"
 
         "%THE_FFMPEG%" %argumentsOne%
-        if "%ERRORLEVEL%" neq 0 exit /b %RC_executeFailed%
+        if "%ERRORLEVEL%" neq "0" exit /b %RC_executeFailed%
 
         "%THE_FFMPEG%" %argumentsTwo%
-        if "%ERRORLEVEL%" neq 0 exit /b %RC_executeFailed%
+        if "%ERRORLEVEL%" neq "0" exit /b %RC_executeFailed%
 
     REM popd
 
@@ -217,10 +224,12 @@ setlocal
     if not exist "%videofile%" endlocal&exit /b %RC_NoFilesFoundFailed%
 
     set arguments=-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "%videofile%"
-
-    for /f "tokens=1" %%a in ('"%THE_FFPROBE%" %arguments%') do set duration=%%a
-    if "%ERRORLEVEL%" neq 0 exit /b 1
+    REM @todo fehlerquelle entfernen ffprobe.exe direkt aufruf
+    for /F "usebackq" %%a in (`ffprobe.exe -v error -show_entries format^=duration -of default^=noprint_wrappers^=1:nokey^=1 "%videofile%"`) do set duration=%%a
+    if "%ERRORLEVEL%" neq "0" exit /b 1
     if not defined duration exit /b 2
+
+    for /f "tokens=1 delims=." %%a in ("%duration%") do set duration=%%a
 
     SET /a "bitrate=(%size%*950*8/%duration%)"
 
@@ -273,14 +282,14 @@ REM  * Gibt die Hilfe in der Console aus
 REM  */
 setlocal
 
-    echo.%SELF_NAME% videoInput.mp4 --execute "--size:10MB" "--resoultion:720" "--ffmpeg:C:\Users\n0vu2\Downloads\ffmpeg-20191217-bd83191-win64-static\ffmpeg-20191217-bd83191-win64-static\bin"
+    echo.%SELF_NAME% videoInput.mp4 --execute "--size:10" "--resoultion:720" "--ffmpeg:C:\Users\n0vu2\Downloads\ffmpeg-20191217-bd83191-win64-static\ffmpeg-20191217-bd83191-win64-static\bin"
     echo.%SELF_NAME% --help
     echo.
     echo. --execute            Der Befehl zum ausführen
     echo. --audio              Mit der Angabe dieses Commands wird audio enthalten sein
     echo. --size:^<size^>      Choose file size in MB (10MB normal, 20MB pr0)
-    echo.         10MB         normal
-    echo.         20MB         pr0
+    echo.         10           normal
+    echo.         20            pr0
     echo. --resolution:^<r^>   Set resolution (720/1080/2160)
     echo.          720         HD
     echo.         1080         FullHD
@@ -327,7 +336,7 @@ echo. Work ended at: %TIME%
 echo.
 echo. ************************************ [ Work wurde FEHLERHAFT beendet ] ************************************
 echo.
-
+pause
 exit /b %abortrc%
 
 REM ----------------------------------------------------------------------------------------------
