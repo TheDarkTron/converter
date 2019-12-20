@@ -1,10 +1,11 @@
+@ECHO off
 rem author: Dark Tron
 rem requirements: ffmpeg (https://www.ffmpeg.org/)
 
 
 
 
-@ECHO off
+
 
 rem promt the user and asaign variable
 SET /p size=Choose file size in MB (10MB normal, 20MB pr0): 
