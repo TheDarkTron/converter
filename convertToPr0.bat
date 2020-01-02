@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 if defined DEBUG_LOGFILE echo on
 
 REM ----------------------------------------------------------------------------------------------
@@ -293,7 +293,7 @@ setlocal
     echo. --resolution:^<r^>   Set resolution (720/1080/2160)
     echo.          720         HD
     echo.         1080         FullHD
-    echo.         2160         2K
+    echo.         2160         4K
     echo. --ffmpeg:^<path^>    Der Pfad in der die ffmpeg.exe liegt
     echo.
     echo. --targetpath:^<path^>  Der Zielpfad für den Output
