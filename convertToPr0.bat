@@ -37,7 +37,7 @@ ffmpeg -i "%~1" -map_metadata -1 -c:v libx264 -profile:v main -level 4.0 -pix_fm
 
 REM shift to next file
 SHIFT
-REM check if there is a next file:
+REM check if there is a next file
 IF NOT [%1] == [] ( goto nextFile )
 
 REM delete pass 1 data
