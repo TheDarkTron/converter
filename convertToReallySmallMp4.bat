@@ -5,7 +5,7 @@ ECHO converting to mp4: "%~1"
 REM %1 is the first drag drop parameter. The "~" removes special chracters
 ECHO.
 
-ffmpeg -n -hwaccel auto -i "%~1" -c:v libx265 -crf 30 -filter_complex "scale=-1:ih*min(1\,1080/ih),fps=fps=30" -tag:v hvc1 -b:a 64k -threads 7 "%~dpn1_really_small.mp4"
+ffmpeg -n -hwaccel auto -i "%~1" -c:v libx265 -crf 30 -filter_complex "fps=30,scale=-1:ih*min(1\,1080/ih)" -tag:v hvc1 -b:a 64k -threads 7 "%~dpn1_really_small.mp4"
 
 REM shift to next file
 SHIFT
