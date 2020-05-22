@@ -6,7 +6,7 @@ ECHO 2. Save to source directory
 ECHO.
 set choice=
 REM promt the user and asaign variable "choice"
-set /p choice=Make your choice:
+set /p choice=Make your choice: 
 REM crop the first character
 if not '%choice%'=='' set choice=%choice:~0,1%
 REM goto places
@@ -23,12 +23,8 @@ ECHO.
 ECHO Saving to Desktop
 :nextFileDesk
 ECHO.
-ECHO converting to mp3:
-REM %1 is the first drag drop parameter. The "~" removes special chracters
-ECHO "%~1"
-ECHO.
 REM % (Variable) ~ (remove special Chars) d (Drive Letter) p (Path) n (Filename) x (Extension)
-lame --preset insane "%~1" "C:\Users\TheDa\Desktop\%~n1.mp3"
+lame --preset insane "%~1" "%USERPROFILE%\Desktop\%~n1.mp3"
 REM shift %3 tp %2, %2 to %1...
 SHIFT
 REM check if there is a next parameter:
@@ -40,10 +36,6 @@ goto end
 ECHO.
 ECHO Saving to source directory
 :nextFileDir
-ECHO.
-ECHO converting to mp3:
-REM %1 is the first drag drop parameter. The "~" removes special chracters
-ECHO "%~1"
 ECHO.
 REM % (Variable) ~ (remove special Chars) d (Drive Letter) p (Path) n (Filename) x (Extension)
 lame --preset insane "%~1" "%~dpn1.mp3"
