@@ -9,6 +9,8 @@ Praktische Scripts für den Alltag, was man halt so braucht, Hauptsächlich conv
 Einfach Drag & Drop drauf da die Scheiße.
 
 ## Description
+|name|Description
+|---|---|
 |convertToMp3.bat                       | converts the input to mp3 with lame with the insane preset (320kbits)|
 |convertToMp3.sh                        | converts the input to mp3 with lame with the insane preset (320kbits)|
 |convertToMp4 - h264                    | converts to mp4 with h264 codec with ffmpeg|
